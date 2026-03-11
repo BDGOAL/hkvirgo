@@ -3,117 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>香港謎路 (Mobile Optimized) - 規格與原型</title>
+    <title>香港謎路 - 終極開發規格書與原型</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap');
-        
-        body { 
-            font-family: 'Noto Sans TC', sans-serif; 
-            -webkit-tap-highlight-color: transparent; 
-            overflow-x: hidden;
-            touch-action: pan-y; /* 允許垂直捲動，但不干擾自定義拖拽 */
-        }
-
-        /* 手機拖拽核心樣式 */
-        #fragment {
-            position: relative;
-            z-index: 20;
-            touch-action: none; /* 重要：防止瀏覽器預設的捲動行為干擾拖拽 */
-            user-select: none;
-        }
-
-        .drop-zone { border: 2px dashed #475569; transition: all 0.2s; }
-        .drop-zone.active { border-color: #fbbf24; background-color: rgba(251, 191, 36, 0.1); transform: scale(1.05); }
-        .success-glow { box-shadow: 0 0 25px rgba(34, 197, 94, 0.5); border-color: #22c55e !important; background: rgba(34, 197, 94, 0.1) !important; }
-
-        .glass { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        body { font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        #fragment { position: relative; z-index: 50; touch-action: none; user-select: none; transition: transform 0.2s; }
+        .drop-zone { border: 2px dashed #475569; transition: all 0.3s; }
+        .drop-zone.active { border-color: #fbbf24; background-color: rgba(251, 191, 36, 0.1); transform: scale(1.02); }
+        .success-glow { box-shadow: 0 0 30px rgba(34, 197, 94, 0.4); border-color: #22c55e !important; background: rgba(34, 197, 94, 0.1) !important; }
+        .glass { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); }
         .view-hidden { display: none; }
+        .brief-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; }
+        h2 { color: #fbbf24; font-weight: 700; font-size: 1.25rem; margin-bottom: 1rem; border-left: 4px solid #fbbf24; padding-left: 0.75rem; }
+        h3 { color: #fff; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem; }
+        p, li { color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-200">
+<body class="bg-slate-950 text-slate-200 min-h-screen">
 
-    <nav class="sticky top-0 z-50 glass px-2 py-3 flex justify-around items-center border-b border-slate-800">
-        <button onclick="switchSection('brief')" id="btn-brief" class="px-3 py-2 rounded-lg text-xs font-bold bg-amber-500 text-black">📄 規格書</button>
-        <button onclick="switchSection('game')" id="btn-game" class="px-3 py-2 rounded-lg text-xs font-bold bg-slate-800 text-slate-400">🎮 遊戲</button>
-        <button onclick="switchSection('memory')" id="btn-memory" class="px-3 py-2 rounded-lg text-xs font-bold bg-slate-800 text-slate-400">📟 回憶機</button>
+    <nav class="sticky top-0 z-[100] glass px-2 py-3 flex justify-around items-center">
+        <button onclick="switchSection('brief')" id="btn-brief" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-black shadow-lg shadow-amber-500/20">📄 規格書</button>
+        <button onclick="switchSection('game')" id="btn-game" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400">🎮 遊戲</button>
+        <button onclick="switchSection('memory')" id="btn-memory" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400">📟 回憶機</button>
     </nav>
 
-    <section id="section-brief" class="p-6 max-w-4xl mx-auto pb-20">
-        <h1 class="text-3xl font-bold text-white mb-6">開發規格書 (Full Brief)</h1>
-        <div class="space-y-6 text-slate-400 text-sm">
-            <div class="p-4 bg-slate-900 rounded-xl border border-slate-800">
-                <h2 class="text-amber-500 font-bold mb-2 uppercase">1. 整體目標</h2>
-                <p>Mobile-first Web App，結合 Geofencing (地理圍欄) 進行實地解謎。MVP 路線：大角咀。</p>
-            </div>
-            <div class="p-4 bg-slate-900 rounded-xl border border-slate-800">
-                <h2 class="text-amber-500 font-bold mb-2 uppercase">2. 核心功能</h2>
-                <ul class="list-disc ml-4 space-y-1">
-                    <li>Geolocation 實時判定 (30m 半徑)</li>
-                    <li>Drag & Drop 拼圖交互</li>
-                    <li>獨立回憶機子頁面系統</li>
-                </ul>
-            </div>
+    <section id="section-brief" class="p-6 max-w-3xl mx-auto pb-24">
+        <header class="mb-10 text-center">
+            <span class="bg-amber-500 text-black text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-widest">Internal Review Document</span>
+            <h1 class="text-3xl font-bold text-white mt-4">香港謎路 · 回憶機解謎<br>Development Brief (MVP)</h1>
+        </header>
+
+        <div class="brief-card">
+            <h2>1. 整體目標 (Overall Objective)</h2>
+            <p>建立一個 Mobile-first Web App，玩家以「回憶機解碼師」身份，在真實街區完成 Geo-location 任務和解謎，解鎖劇情與回憶。MVP 階段聚焦於單一路線（例如：大角咀 · 爺爺的回憶），重點是清晰的遊戲流程、回憶機 Subpage 與資料結構，方便日後擴充。</p>
+        </div>
+
+        <div class="brief-card">
+            <h2>2. 用戶角色與故事前提 (Narrative)</h2>
+            <p><strong>玩家身份：</strong>回憶機解碼師。</p>
+            <p><strong>起始情境：</strong>某位客人把一部裝載家族記憶的「回憶機」交給玩家，請求協助解鎖。</p>
+            <h3>任務與解鎖條件：</h3>
+            <ul class="list-disc ml-5">
+                <li><strong>任務一：</strong>到訪回憶中的地點，收集「回憶鎖匙」。取得足夠鎖匙後，開始解鎖回憶片段。</li>
+                <li><strong>任務二：</strong>整合所有已解鎖的回憶線索，找出「爺爺的遺願」，完成整體故事。</li>
+            </ul>
+        </div>
+
+        <div class="brief-card">
+            <h2>3. 登入／開局流程</h2>
+            <h3>LandingPage</h3>
+            <p>核心 CTA：「輸入電話號碼開始」。表單只需要電話號碼（Text Input）。</p>
+            <h3>ConsentPage (個人資料及定位同意)</h3>
+            <p>需清楚說明收集資料類型（電話、進度、定位）及其用途（判斷抵達位置、人流統計）。提供必選的資料使用同意 Checkbox 及可選的推廣資訊 Checkbox。</p>
+            <h3>UserGuide & MapSelect</h3>
+            <p>顯示遊戲玩法概述與安全提示（注意交通、勿進私地）。MVP 僅顯示「大角咀 · 爺爺的回憶」路線。</p>
+        </div>
+
+        <div class="brief-card">
+            <h2>4. 遊戲起始與主流程 (Game Flow)</h2>
+            <h3>WorldMap (地圖畫面)</h3>
+            <p>顯示玩家位置與謎題標記（3–6 個）。使用 Geolocation API 判斷半徑（30–50 公尺），按鈕變為「開始解謎」。</p>
+            <h3>PuzzleScreen (單一地點解謎)</h3>
+            <p>包含地點背景、題目本體。MVP 支援：Multiple Choice (MCQ)、Short Text (填空) 及 <strong>Drag and Drop (拖放交互)</strong>。</p>
+        </div>
+
+        <div class="brief-card">
+            <h2>5. 回憶機 (Memory Machine) Subpage</h2>
+            <p><strong>角色定位：</strong>獨立子頁，提供純閱讀模式。玩家在玩完後或在家中也可打開此頁面。顯示九宮格或卡片列表，點擊已解鎖格進入 Detail Page 閱讀長篇故事。</p>
+        </div>
+
+        <div class="brief-card">
+            <h2>6. 最終任務 (Final Mission)</h2>
+            <p>當收集滿 6 或 9 個鎖匙後，觸發 Final Story。玩家需根據回憶線索回答爺爺的遺願，決定 Ending 分支（好結局 / 遺憾結局）。</p>
+        </div>
+
+        <div class="brief-card">
+            <h2>7. 技術要求 (Tech Stack)</h2>
+            <ul class="list-disc ml-5 mono text-xs">
+                <li>Frontend: Next.js (App Router) + Tailwind CSS</li>
+                <li>Interaction: Framer Motion (Drag & Drop Support)</li>
+                <li>Storage: LocalStorage (Browser-based)</li>
+                <li>Map: Google Maps / Leaflet API</li>
+            </ul>
         </div>
     </section>
 
-    <section id="section-game" class="view-hidden p-6 pb-24 max-w-md mx-auto">
-        <div class="text-center mb-6">
-            <h2 class="text-xl font-bold text-white">實地解謎頁面</h2>
-            <p class="text-xs text-slate-500 uppercase tracking-widest">大角咀碼頭 · 舊相片</p>
+    <section id="section-game" class="view-hidden p-6 pb-24 max-w-md mx-auto min-h-screen">
+        <div class="text-center mb-6 pt-4">
+            <h2 class="text-xl font-bold text-white border-none p-0 mb-0">🎮 實境解謎 (Puzzle)</h2>
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Location: 大角咀碼頭</p>
         </div>
 
-        <div class="bg-slate-900 border-[4px] border-slate-800 rounded-[2.5rem] p-6 shadow-2xl min-h-[500px] flex flex-col relative">
-            <div class="mb-4 text-center">
-                <p class="text-[11px] text-slate-400 italic">"請用手指將碎片拖到白色的虛線框內。"</p>
+        <div class="bg-slate-900 border-[6px] border-slate-800 rounded-[3rem] p-6 shadow-2xl relative min-h-[550px] flex flex-col">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-2">
+                <span class="text-[10px] font-bold text-amber-500 mono tracking-widest uppercase italic">Quest Mode</span>
+                <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-300 mono">GPS: 22.31, 114.16</span>
             </div>
 
-            <div class="relative flex-grow flex flex-col items-center justify-around py-4">
+            <div class="flex-grow flex flex-col justify-around">
+                <div class="text-center">
+                    <h3 class="text-lg font-bold mb-2">任務：修復舊相片</h3>
+                    <p class="text-xs text-slate-400 italic">"請用手指長按碎片，拖動到白色方框內。"</p>
+                </div>
                 
-                <div id="fragment" class="drag-item w-24 h-24 bg-amber-100 rounded shadow-2xl flex items-center justify-center text-slate-900 text-xs font-black border-4 border-white rotate-6 select-none">
-                    相片碎片
+                <div class="flex justify-center h-32 items-center">
+                    <div id="fragment" class="w-24 h-24 bg-amber-200 rounded shadow-2xl flex items-center justify-center text-slate-900 text-xs font-black border-4 border-white rotate-6 select-none">
+                        相片碎片
+                    </div>
                 </div>
 
-                <div id="target" class="drop-zone w-48 h-48 rounded-2xl flex items-center justify-center text-[10px] text-slate-600 text-center p-6 bg-slate-950/50">
-                    將碎片拖放至此<br>修復回憶
+                <div id="target" class="drop-zone w-48 h-48 mx-auto rounded-xl flex items-center justify-center text-[10px] text-slate-600 text-center p-6 bg-slate-950/50">
+                    目標區域<br>(請將碎片拖入)
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="section-memory" class="view-hidden p-6 pb-24 max-w-md mx-auto">
-        <div class="text-center mb-6">
-            <h2 class="text-xl font-bold text-white tracking-widest italic uppercase">Memory Machine</h2>
+    <section id="section-memory" class="view-hidden p-6 pb-24 max-w-md mx-auto min-h-screen">
+        <div class="text-center mb-6 pt-4">
+            <h2 class="text-xl font-bold text-white border-none p-0 mb-0 italic tracking-widest">📟 MEMORY MACHINE</h2>
+            <p class="text-[10px] text-slate-500 mt-1">獨立子頁系統 (Archive System)</p>
         </div>
 
-        <div id="memory-grid" class="bg-slate-900 border-[4px] border-slate-800 rounded-[2.5rem] p-6 shadow-2xl min-h-[500px]">
-            <div class="flex justify-between items-center mb-6">
-                <span class="text-[10px] font-bold text-slate-500 uppercase">Archive List</span>
-                <span class="text-[10px] text-amber-500 font-mono">Unlocked: <span id="key-count">0</span>/6</span>
+        <div id="memory-grid" class="bg-slate-900 border-[6px] border-slate-800 rounded-[3rem] p-6 shadow-2xl min-h-[550px]">
+            <div class="mb-6 flex justify-between items-end">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">已解鎖片段</h3>
+                <span class="text-[10px] mono text-amber-500">Keys: <span id="key-count">0</span>/6</span>
             </div>
-            
+
             <div class="grid grid-cols-3 gap-3">
-                <div id="slot-1" onclick="openMemory(1)" class="aspect-square bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-center grayscale opacity-30 transition-all duration-500">
+                <div id="slot-1" onclick="openMemory(1)" class="aspect-square bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-center grayscale opacity-30 cursor-not-allowed transition-all duration-500">
                     <span class="text-2xl">🏮</span>
                 </div>
-                <div class="aspect-square bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-center opacity-10">?</div>
-                <div class="aspect-square bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-center opacity-10">?</div>
+                <div class="aspect-square bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-center opacity-10">?</div>
+                <div class="aspect-square bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-center opacity-10">?</div>
+                <div class="aspect-square bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-center opacity-10">?</div>
+                <div class="aspect-square bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-center opacity-10">?</div>
+                <div class="aspect-square bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-center opacity-10">?</div>
+            </div>
+
+            <div class="mt-8 p-4 bg-slate-950/80 rounded-xl border border-slate-800">
+                <p class="text-[10px] text-amber-500/80 mono leading-relaxed">
+                    > SYSTEM LOG:<br>
+                    回憶解碼師身分驗證成功。等待資料導入...
+                </p>
             </div>
         </div>
 
-        <div id="memory-detail" class="view-hidden bg-slate-900 border-[4px] border-slate-800 rounded-[2.5rem] p-8 shadow-2xl min-h-[500px]">
-            <button onclick="closeMemory()" class="text-xs text-amber-500 mb-6 font-bold">← 返回列表</button>
-            <h3 class="text-2xl font-bold text-white mb-4">大角咀碼頭的海風</h3>
-            <p class="text-sm text-slate-300 leading-relaxed italic">
-                「以前大角咀仲未填海，每日收工，我都會企喺度吹海風。雖然依家周圍都係高樓大廈，但只要合埋眼，我就好似返返去 1970 年咁...」
-            </p>
+        <div id="memory-detail" class="view-hidden bg-slate-900 border-[6px] border-slate-800 rounded-[3rem] p-8 shadow-2xl min-h-[550px] flex flex-col">
+            <button onclick="closeMemory()" class="self-start text-xs text-amber-500 mb-6 font-bold underline">← 返回列表</button>
+            <div class="flex-grow">
+                <h3 class="text-2xl font-bold text-white mb-4">大角咀碼頭的海風</h3>
+                <p class="text-sm text-slate-300 leading-relaxed italic">
+                    「以前大角咀仲未填海，我每日收工都會去碼頭坐。依家雖然變咗高樓，但只要合埋眼，仲好似聽得見海浪聲...」
+                </p>
+                <div class="mt-10 border-t border-slate-800 pt-4">
+                    <p class="text-[10px] text-amber-400 font-bold uppercase tracking-widest underline">爺爺的筆記</p>
+                    <p class="text-[11px] text-slate-500 mt-2 leading-relaxed">這張照片是他在 1978 年拍下的，背後寫著：『無論點變，我哋都一齊。』</p>
+                </div>
+            </div>
         </div>
     </section>
 
     <script>
         let isUnlocked = false;
 
-        //切換頁面
         function switchSection(name) {
             document.querySelectorAll('section').forEach(s => s.classList.add('view-hidden'));
             document.getElementById('section-' + name).classList.remove('view-hidden');
@@ -123,34 +179,29 @@
             });
             document.getElementById('btn-' + name).classList.remove('bg-slate-800', 'text-slate-400');
             document.getElementById('btn-' + name).classList.add('bg-amber-500', 'text-black');
+            window.scrollTo(0,0);
         }
 
-        // --- 手機 Touch 拖拽邏輯 ---
+        // --- MOBILE TOUCH DRAG LOGIC ---
         const frag = document.getElementById('fragment');
         const target = document.getElementById('target');
-        let offsetX = 0, offsetY = 0;
+        let startX, startY, initialX = 0, initialY = 0;
 
         frag.addEventListener('touchstart', (e) => {
             const touch = e.touches[0];
-            const rect = frag.getBoundingClientRect();
-            offsetX = touch.clientX - rect.left;
-            offsetY = touch.clientY - rect.top;
+            startX = touch.clientX;
+            startY = touch.clientY;
             frag.style.transition = 'none';
-        });
+        }, { passive: false });
 
         frag.addEventListener('touchmove', (e) => {
-            e.preventDefault(); // 防止捲動螢幕
+            e.preventDefault();
             const touch = e.touches[0];
+            const dx = touch.clientX - startX;
+            const dy = touch.clientY - startY;
             
-            // 計算新位置
-            const x = touch.clientX - offsetX;
-            const y = touch.clientY - offsetY;
-            
-            frag.style.position = 'fixed';
-            frag.style.left = x + 'px';
-            frag.style.top = y + 'px';
+            frag.style.transform = `translate(${dx}px, ${dy}px) rotate(6deg)`;
 
-            // 檢查是否重疊
             const targetRect = target.getBoundingClientRect();
             if (touch.clientX > targetRect.left && touch.clientX < targetRect.right &&
                 touch.clientY > targetRect.top && touch.clientY < targetRect.bottom) {
@@ -158,7 +209,7 @@
             } else {
                 target.classList.remove('active');
             }
-        });
+        }, { passive: false });
 
         frag.addEventListener('touchend', (e) => {
             const touch = e.changedTouches[0];
@@ -166,27 +217,24 @@
 
             if (touch.clientX > targetRect.left && touch.clientX < targetRect.right &&
                 touch.clientY > targetRect.top && touch.clientY < targetRect.bottom) {
-                // 成功解鎖
                 isUnlocked = true;
-                target.innerHTML = "<span class='text-green-400 font-bold'>解鎖成功！</span>";
+                target.innerHTML = "<span class='text-green-400 font-bold animate-pulse'>🧩 解鎖成功！</span>";
                 target.classList.add('success-glow');
                 frag.style.display = 'none';
                 document.getElementById('key-count').innerText = "1";
-                document.getElementById('slot-1').classList.remove('grayscale', 'opacity-30');
+                document.getElementById('slot-1').classList.remove('grayscale', 'opacity-30', 'cursor-not-allowed');
                 document.getElementById('slot-1').classList.add('border-amber-500', 'bg-amber-900/20');
-                alert("回憶解鎖：已存入回憶機。");
+                alert("回憶片段已解鎖！請前往回憶機系統查看存檔。");
             } else {
-                // 重置位置
-                frag.style.position = 'relative';
-                frag.style.left = '0px';
-                frag.style.top = '0px';
+                frag.style.transition = 'transform 0.5s ease';
+                frag.style.transform = 'translate(0px, 0px) rotate(6deg)';
                 target.classList.remove('active');
             }
         });
 
-        // 回憶機功能
+        // Memory Logic
         function openMemory(id) {
-            if (!isUnlocked) { alert("請先完成解謎！"); return; }
+            if (!isUnlocked) { alert("尚未解鎖該片段，請先完成遊戲任務！"); return; }
             document.getElementById('memory-grid').classList.add('view-hidden');
             document.getElementById('memory-detail').classList.remove('view-hidden');
         }
